@@ -1,6 +1,6 @@
 (defpackage #:api-doc-test
   (:use #:CL #:lisp-unit)
-  (:import-from #:github-api-doc
+  (:import-from #:api-doc
                 #:api-doc
                 #:make-call-parameters
                 #:make-call-url))
@@ -8,19 +8,19 @@
 (in-package #:api-doc-test)
 
 (define-test coerce-parameter-type-test
-  (assert-equal "" (github-api-doc::coerce-parameter-type "" "string"))
-  (assert-equal "aa" (github-api-doc::coerce-parameter-type "aa" "string"))
+  (assert-equal "" (api-doc::coerce-parameter-type "" "string"))
+  (assert-equal "aa" (api-doc::coerce-parameter-type "aa" "string"))
 
   ;; from (read-line) or keywords
-  (assert-equal "" (github-api-doc::coerce-parameter-type "" "boolean"))
-  (assert-equal "false" (github-api-doc::coerce-parameter-type "false" "boolean"))
-  (assert-equal "true" (github-api-doc::coerce-parameter-type "true" "boolean"))
+  (assert-equal "" (api-doc::coerce-parameter-type "" "boolean"))
+  (assert-equal "false" (api-doc::coerce-parameter-type "false" "boolean"))
+  (assert-equal "true" (api-doc::coerce-parameter-type "true" "boolean"))
 
   ;; from keyword
-  (assert-equal 1 (github-api-doc::coerce-parameter-type 1 "integer"))
+  (assert-equal 1 (api-doc::coerce-parameter-type 1 "integer"))
   ;; from (read-line)
-  (assert-equal 12 (github-api-doc::coerce-parameter-type "12" "integer"))
-  (assert-equal "" (github-api-doc::coerce-parameter-type "" "integer")) ;; empty (read-line)
+  (assert-equal 12 (api-doc::coerce-parameter-type "12" "integer"))
+  (assert-equal "" (api-doc::coerce-parameter-type "" "integer")) ;; empty (read-line)
   )
 
 (define-test make-call-parameters-test
@@ -46,10 +46,10 @@ true
 
 	;; empty parameters
 	(progn (setf api-doc (make-instance 'api-doc
-                                :api "POST /user/repos"
-								:parameters '()))
+                                        :api "POST /user/repos"
+                                        :parameters '()))
 		   (assert-equal ""
-                  (make-call-parameters api-doc :some "a")))
+                         (make-call-parameters api-doc :some "a")))
     ))
 
 (define-test make-call-url-test

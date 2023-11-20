@@ -1,5 +1,5 @@
 ;;; github api documents
-(defpackage #:github-api-doc
+(defpackage #:api-doc
   (:use #:CL)
   (:export #:api-doc
            #:http-method
@@ -9,12 +9,12 @@
            #:make-call-url)
   )
 
-(in-package #:github-api-doc)
+(in-package #:api-doc)
 
 (defparameter *api-root-url* "https://api.github.com")
 (defparameter *api-json-file-path* 
   (merge-pathnames (asdf:component-pathname
-                    (asdf:find-system :github-api-cl))
+                    (asdf:find-system :api-cl))
                    #P"/api.json")
   "api json file path")
 

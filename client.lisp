@@ -1,15 +1,15 @@
 ;;; client of github api call
-(defpackage #:github-client
-  (:use #:CL #:github-api-doc)
+(defpackage #:client
+  (:use #:CL #:api-doc)
   (:shadow #:get) ;; shadow get from CL
   (:export #:token-p
            #:token
            #:token-p-or-input
            #:api-client
            #:http-call
-           #:github-api-call))
+           #:api-call))
 
-(in-package #:github-client)
+(in-package #:client)
 
 (defclass api-client ()
   ((token
@@ -28,8 +28,8 @@
   (if (not (token-p clt))
       (progn
         (format t "Please input your token~%")
-        (setf (token clt) (read-line))
-        )))
+        (setf (token clt) (read-line)))))
+
 
 (defgeneric http-call (client url &rest args &key method &allow-other-keys))
 
@@ -38,12 +38,12 @@
   (destructuring-bind
       (&key
          content
-         (headers '(("Accept" . "application/vnd.github+json")) headers-p)
-         &allow-other-keys)
+         (headers '(("Accept" . "application/json")) headers-p)
+       &allow-other-keys)
       args
     ;; add the default header when receive the custom ones
     (when headers-p
-      (push '("Accept" . "application/vnd.github+json") headers))
+      (push '("Accept" . "application/json") headers))
     
     (let* ((lambda-list '())
            (call-func (cond
@@ -55,15 +55,15 @@
                         ((string= (string-downcase method) "head") #'dex:head)
                         ((string= (string-downcase method) "put") #'dex:put)
                         ((string= (string-downcase method) "patch") #'dex:patch)
-                        ((string= (string-downcase method) "fetch") #'dex:fetch)))
-           )
+                        ((string= (string-downcase method) "fetch") #'dex:fetch))))
+
       (destructuring-bind
           (&key
              (token (token clt) token-p)
              (user-name "")
              (passd "" passd-p)
              (proxy "" proxy-p)
-             &allow-other-keys)
+           &allow-other-keys)
           args
         (cond
           ;; If has token, use token first
@@ -72,7 +72,7 @@
            (push (cons "Authorization"
                        (format nil "token ~a" token))
                  headers))
-        
+
           ;; If neither client's token or keyword token is given
           ;; try use user-name and password
           (passd-p
@@ -80,26 +80,24 @@
 
           ;; give proxy
           (proxy-p
-           (setf lambda-list (append lambda-list (list :proxy proxy :insecure t))))
-          )
+           (setf lambda-list (append lambda-list (list :proxy proxy :insecure t)))))
+
 
         (setf lambda-list (append lambda-list (list :headers headers)))
 
-        (apply call-func url lambda-list)
-        ))))
+        (apply call-func url lambda-list)))))
 
-(defgeneric github-api-call (client api &rest args &key &allow-other-keys))
+
+(defgeneric api-call (client api &rest args &key &allow-other-keys))
 
 ;; Except token, user-name, and passd, all other keywords are parameters for this api
-(defmethod github-api-call ((clt api-client) (api api-doc)
-                            &rest args)
+(defmethod api-call ((clt api-client) (api api-doc) &rest args)
   (let* ((url (apply #'make-call-url api args))
          (parameters (apply #'make-call-parameters api args))
-         (whole-url (concatenate 'string url parameters))
-         )
+         (whole-url (concatenate 'string url parameters)))
+
     (apply #'http-call
            clt
            whole-url
            :method (http-method api)
-           args)
-    ))
+           args)))

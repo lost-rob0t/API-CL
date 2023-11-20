@@ -1,12 +1,12 @@
 (defpackage #:client-test
   (:use #:CL #:lisp-unit)
-  (:import-from #:github-client
+  (:import-from #:client
                 #:token-p
                 #:token
                 #:token-p-or-input
                 #:api-client
                 #:http-call
-                #:github-api-call))
+                #:api-call))
 
 (in-package #:client-test)
 
@@ -74,8 +74,8 @@
                                                                  :element-type 'flexi-streams:octet)))
                                        (read-sequence content (gethash :RAW-BODY
                                                                        (alexandria:plist-hash-table env)))
-                                       (flexi-streams:octets-to-string content)
-                                       )))
+                                       (flexi-streams:octets-to-string content))))
+
 
                 (assert-equal ""
                               (progn (http-call clt
@@ -87,8 +87,8 @@
                                                                  :element-type 'flexi-streams:octet)))
                                        (read-sequence content (gethash :RAW-BODY
                                                                        (alexandria:plist-hash-table env)))
-                                       (flexi-streams:octets-to-string content)
-                                       )))
+                                       (flexi-streams:octets-to-string content))))
+
 
                 ;; check the accept headers
                 (assert-equal "application/vnd.github+json"
@@ -96,8 +96,8 @@
                                                 "http://127.0.0.1:5000"
                                                 :method "post"
                                                 :content "this is content")
-                                     (gethash "accept" (gethash :headers (alexandria:plist-hash-table env)))
-                                     ))
+                                     (gethash "accept" (gethash :headers (alexandria:plist-hash-table env)))))
+
 
                 ;; check the given headers 
                 (http-call clt
@@ -123,8 +123,8 @@
                                                                  :element-type 'flexi-streams:octet)))
                                        (read-sequence content (gethash :RAW-BODY
                                                                        (alexandria:plist-hash-table env)))
-                                       (flexi-streams:octets-to-string content)
-                                       )))
+                                       (flexi-streams:octets-to-string content))))
+
 
                 ;; other methods won't give content to server
                 (assert-equal ""
@@ -138,11 +138,11 @@
                                                                  :element-type 'flexi-streams:octet)))
                                        (read-sequence content (gethash :RAW-BODY
                                                                        (alexandria:plist-hash-table env)))
-                                       (flexi-streams:octets-to-string content)
-                                       )))
+                                       (flexi-streams:octets-to-string content))))
+
                 
                 ;; give username and passd
-                (setf (github-client::token clt) "") ;; empty token first
+                (setf (client::token clt) "") ;; empty token first
                 (assert-equal (format nil "Basic ~a"
                                       (cl-base64:string-to-base64-string "aa:bb"))
                               (car (multiple-value-list
